@@ -5,8 +5,8 @@
 # Core GUI Framework
 customtkinter==5.2.2
 
-# HTTP Requests for Ollama API
-requests==2.31.0
+# HTTP Requests for Ollama API - Updated for security fixes
+requests>=2.32.4
 
 # Image processing for GUI
 Pillow>=10.0.0
