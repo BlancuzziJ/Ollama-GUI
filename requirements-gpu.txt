@@ -1,0 +1,7 @@
+# Optional GPU Detection Dependencies
+# Install with: pip install -r requirements-gpu.txt
+# These provide enhanced hardware information for local AI recommendations
+
+GPUtil==1.4.0
+psutil==5.9.0
+setuptools>=65.0.0  # Required for Python 3.12+ distutils compatibility

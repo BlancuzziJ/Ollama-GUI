@@ -1,0 +1,19 @@
+{
+  "ollama_url": "http://localhost:11434",
+  "auto_save": true,
+  "max_history": 100,
+  "theme": "dark",
+  "window_geometry": "1200x800",
+  "default_model": "",
+  "chat_settings": {
+    "auto_scroll": true,
+    "show_timestamps": true,
+    "word_wrap": true,
+    "font_size": 14
+  },
+  "model_settings": {
+    "auto_refresh": true,
+    "show_model_info": true,
+    "confirm_delete": true
+  }
+}
