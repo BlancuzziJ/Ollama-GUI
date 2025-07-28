@@ -15,7 +15,7 @@ Licensed under the MIT License - see LICENSE file for details
 
 Author: John Blancuzzi
 Email: john@blancuzzi.org
-Project: https://github.com/jblancuzzi/shamollama
+Project: https://github.com/BlancuzziJ/Ollama-GUI
 """
 
 import customtkinter as ctk
@@ -1046,7 +1046,7 @@ class ShamaOllamaGUI:
         github_repo_btn = ctk.CTkButton(
             button_frame,
             text="⭐ Star on GitHub",
-            command=lambda: self.open_url("https://github.com/jblancuzzi/shamollama"),
+            command=lambda: self.open_url("https://github.com/BlancuzziJ/Ollama-GUI"),
             height=40,
             font=ctk.CTkFont(size=14, weight="bold"),
             fg_color=("gray", "darkgray"),

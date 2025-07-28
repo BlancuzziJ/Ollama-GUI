@@ -33,16 +33,16 @@ That's it! 🎉
 
 ```cmd
 # Method 1: The Easy Way
-git clone https://github.com/jblancuzzi/shamollama.git
-cd shamollama
+git clone https://github.com/BlancuzziJ/Ollama-GUI.git
+cd Ollama-GUI
 setup.bat      # Installs everything + offers desktop shortcut
 run_gui.bat    # Starts ShamaOllama
 ```
 
 ```cmd
 # Method 2: Manual Setup
-git clone https://github.com/jblancuzzi/shamollama.git
-cd shamollama
+git clone https://github.com/BlancuzziJ/Ollama-GUI.git
+cd Ollama-GUI
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
@@ -54,8 +54,8 @@ python main.py
 
 ```bash
 # Method 1: The Easy Way
-git clone https://github.com/jblancuzzi/shamollama.git
-cd shamollama
+git clone https://github.com/BlancuzziJ/Ollama-GUI.git
+cd Ollama-GUI
 chmod +x run_gui.sh
 ./run_gui.sh   # Handles everything automatically
 chmod +x create_desktop_shortcut.sh
@@ -64,8 +64,8 @@ chmod +x create_desktop_shortcut.sh
 
 ```bash
 # Method 2: Manual Setup
-git clone https://github.com/jblancuzzi/shamollama.git
-cd shamollama
+git clone https://github.com/BlancuzziJ/Ollama-GUI.git
+cd Ollama-GUI
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -76,8 +76,8 @@ python main.py
 
 ```bash
 # Method 1: The Easy Way
-git clone https://github.com/jblancuzzi/shamollama.git
-cd shamollama
+git clone https://github.com/BlancuzziJ/Ollama-GUI.git
+cd Ollama-GUI
 chmod +x run_gui.sh
 ./run_gui.sh   # Handles everything automatically
 chmod +x create_desktop_shortcut_macos.sh
@@ -86,8 +86,8 @@ chmod +x create_desktop_shortcut_macos.sh
 
 ```bash
 # Method 2: Manual Setup
-git clone https://github.com/jblancuzzi/shamollama.git
-cd shamollama
+git clone https://github.com/BlancuzziJ/Ollama-GUI.git
+cd Ollama-GUI
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -178,7 +178,7 @@ After creating shortcuts, you can:
 ## 🆘 Need Help?
 
 - 📖 **Full docs**: [INSTALL.md](INSTALL.md)
-- 🐛 **Issues**: [GitHub Issues](https://github.com/jblancuzzi/shamollama/issues)
-- 💬 **Community**: [Discussions](https://github.com/jblancuzzi/shamollama/discussions)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/BlancuzziJ/Ollama-GUI/issues)
+- 💬 **Community**: [Discussions](https://github.com/BlancuzziJ/Ollama-GUI/discussions)
 
 **Happy AI chatting!** 🎸✨

@@ -170,7 +170,7 @@ This project is **100% open source** under the MIT License:
 
 ## GitHub Repository
 
-**Primary Location**: `https://github.com/jblancuzzi/shamollama`
+**Primary Location**: `https://github.com/BlancuzziJ/Ollama-GUI`
 
 ### Repository Features
 

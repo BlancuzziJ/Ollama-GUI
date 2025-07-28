@@ -103,7 +103,7 @@ echo For help and documentation:
 echo   - README.md - Complete guide
 echo   - INSTALL.md - Installation details
 echo   - QUICKSTART.md - Fast setup guide
-echo   - GitHub: https://github.com/jblancuzzi/shamollama
+echo   - GitHub: https://github.com/BlancuzziJ/Ollama-GUI
 echo.
 echo 💖 Support ShamaOllama development:
 echo   - GitHub Sponsors: https://github.com/sponsors/BlancuzziJ

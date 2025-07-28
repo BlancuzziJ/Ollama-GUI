@@ -31,9 +31,9 @@ _Paying homage to "Shama Lama Ding Dong" from the classic comedy Animal House (1
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![CustomTkinter](https://img.shields.io/badge/GUI-CustomTkinter-green.svg)](https://github.com/TomSchimansky/CustomTkinter)
-[![GitHub release](https://img.shields.io/github/release/jblancuzzi/shamollama.svg)](https://github.com/jblancuzzi/shamollama/releases)
-[![GitHub issues](https://img.shields.io/github/issues/jblancuzzi/shamollama.svg)](https://github.com/jblancuzzi/shamollama/issues)
-[![GitHub stars](https://img.shields.io/github/stars/jblancuzzi/shamollama.svg)](https://github.com/jblancuzzi/shamollama/stargazers)
+[![GitHub release](https://img.shields.io/github/release/BlancuzziJ/Ollama-GUI.svg)](https://github.com/BlancuzziJ/Ollama-GUI/releases)
+[![GitHub issues](https://img.shields.io/github/issues/BlancuzziJ/Ollama-GUI.svg)](https://github.com/BlancuzziJ/Ollama-GUI/issues)
+[![GitHub stars](https://img.shields.io/github/stars/BlancuzziJ/Ollama-GUI.svg)](https://github.com/BlancuzziJ/Ollama-GUI/stargazers)
 
 ![ShamaOllama Demo](https://via.placeholder.com/800x500/2b2b2b/ffffff?text=ShamaOllama+Demo)
 
@@ -153,8 +153,8 @@ These meanings reflect our goal: creating a peaceful, enlightening, and responsi
 #### Windows (The Easy Way)
 
 ```cmd
-git clone https://github.com/jblancuzzi/shamollama.git
-cd shamollama
+git clone https://github.com/BlancuzziJ/Ollama-GUI.git
+cd Ollama-GUI
 setup.bat      # Installs everything + offers desktop shortcut
 run_gui.bat    # Starts ShamaOllama 🎉
 ```
@@ -162,8 +162,8 @@ run_gui.bat    # Starts ShamaOllama 🎉
 #### Linux/Mac (The Easy Way)
 
 ```bash
-git clone https://github.com/jblancuzzi/shamollama.git
-cd shamollama
+git clone https://github.com/BlancuzziJ/Ollama-GUI.git
+cd Ollama-GUI
 ./run_gui.sh   # Handles setup automatically 🎉
 ./create_desktop_shortcut_universal.sh  # Optional: Desktop shortcut
 ```
@@ -172,8 +172,8 @@ cd shamollama
 
 ```bash
 # Clone the repository
-git clone https://github.com/jblancuzzi/shamollama.git
-cd shamollama
+git clone https://github.com/BlancuzziJ/Ollama-GUI.git
+cd Ollama-GUI
 
 # Create virtual environment
 python -m venv .venv

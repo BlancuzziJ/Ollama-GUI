@@ -202,7 +202,7 @@ The future of AI shouldn't be controlled by a few large companies. It should be 
 **Contact & Collaboration:**
 
 📧 john@blancuzzi.org  
-🐙 https://github.com/jblancuzzi/shamollama  
+🐙 https://github.com/BlancuzziJ/Ollama-GUI  
 💖 https://github.com/sponsors/BlancuzziJ
 
 _Let's build the future of local AI together._

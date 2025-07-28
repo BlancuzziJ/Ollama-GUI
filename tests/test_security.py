@@ -28,7 +28,7 @@ def test_url_validation():
         
         # Test valid URLs
         valid_urls = [
-            "https://github.com/jblancuzzi/shamollama",
+            "https://github.com/BlancuzziJ/Ollama-GUI",
             "http://localhost:11434",
             "https://github.com/sponsors/BlancuzziJ"
         ]

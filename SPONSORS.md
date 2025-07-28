@@ -95,7 +95,7 @@ Questions about sponsorship? Reach out:
 
 - **Email**: john@blancuzzi.org
 - **GitHub**: [@jblancuzzi](https://github.com/jblancuzzi)
-- **Project**: [ShamaOllama](https://github.com/jblancuzzi/shamollama)
+- **Project**: [ShamaOllama](https://github.com/BlancuzziJ/Ollama-GUI)
 
 ---
 
