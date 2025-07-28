@@ -38,7 +38,6 @@ catch {
     Write-Host ""
     Write-Host "🎯 ShamaOllama will start, but you'll need Ollama running to chat." -ForegroundColor Yellow
     Write-Host ""
-    Read-Host "Press Enter to continue"
 }
 
 # Launch the application

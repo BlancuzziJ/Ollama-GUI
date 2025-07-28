@@ -6,8 +6,21 @@ echo [*] Starting ShamaOllama...
 echo Paying homage to "Shama Lama Ding Dong" from Animal House (1978)
 echo.
 
-REM Activate virtual environment
-call .venv\Scripts\activate.bat
+REM Activate virtual environment if it exists
+if exist ".venv\Scripts\activate.bat" (
+    echo [*] Activating virtual environment...
+    call .venv\Scripts\activate.bat
+)
+
+REM Install dependencies if needed
+if exist "requirements.txt" (
+    echo [*] Checking dependencies...
+    python -c "import customtkinter, requests" 2>nul
+    if errorlevel 1 (
+        echo [*] Installing missing dependencies...
+        pip install -r requirements.txt
+    )
+)
 
 REM Check if Ollama is installed and running
 echo [*] Checking Ollama status...
@@ -24,7 +37,6 @@ if errorlevel 1 (
     echo.
     echo [*] ShamaOllama will start, but you'll need Ollama running to chat.
     echo.
-    pause
 ) else (
     echo [+] Ollama is running!
 )
