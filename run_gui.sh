@@ -30,12 +30,22 @@ if [ -f "requirements.txt" ]; then
 fi
 
 # Check if Ollama is accessible
-echo "🔗 Checking Ollama connection..."
+echo "� Checking Ollama status..."
 if curl -s http://localhost:11434/api/version >/dev/null 2>&1; then
     echo "✅ Ollama is running!"
 else
-    echo "⚠️  Ollama not detected. Make sure Ollama is running."
-    echo "   You can start it with: ollama serve"
+    echo ""
+    echo "⚠️  WARNING: Ollama is not running or not installed!"
+    echo ""
+    echo "📋 To fix this:"
+    echo "  1. Download from: https://ollama.ai"
+    echo "  2. Install Ollama for your platform"
+    echo "  3. Run: ollama pull llama3.2:1b  (small model)"
+    echo "  4. Or: ollama pull llama3.2:3b   (better quality)"
+    echo ""
+    echo "🎯 ShamaOllama will start, but you'll need Ollama running to chat."
+    echo ""
+    read -p "Press Enter to continue..."
 fi
 
 echo ""

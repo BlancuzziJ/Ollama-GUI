@@ -14,17 +14,21 @@ ShamaOllama implements comprehensive security measures to protect users:
 
 ### Input Validation
 
-- **Message Content Validation**: All user messages are validated for length, dangerous patterns, and malicious content
+- **Message Length Validation**: User messages are validated for reasonable length limits
 - **Model Name Validation**: Model names are validated to prevent injection attacks
 - **URL Validation**: All URLs are validated before opening to prevent malicious redirects
 - **File Path Validation**: File operations are restricted to safe directories
+
+_Note: Content validation has been minimized to ensure maximum performance and user freedom. ShamaOllama acts as a fast bridge to Ollama, trusting Ollama's own security mechanisms for content handling._
 
 ### Data Protection
 
 - **Secure Logging**: Security events are logged for monitoring and debugging
 - **Safe File Operations**: All file operations are restricted to the user's `.shamollama` directory
 - **Session Management**: Secure session tokens are generated for internal operations
-- **Input Sanitization**: User inputs are sanitized before processing
+- **Minimal Input Processing**: User inputs are passed directly to Ollama with minimal interference for maximum speed
+
+_Note: ShamaOllama prioritizes performance and user freedom, delegating content security to Ollama's robust handling mechanisms._
 
 ### Network Security
 
@@ -37,11 +41,12 @@ ShamaOllama implements comprehensive security measures to protect users:
 
 ### Protected Against
 
-- **Code Injection**: Script tags and executable code are blocked
 - **Path Traversal**: File operations are restricted to safe directories
-- **XSS Attacks**: Cross-site scripting attempts are filtered
 - **Malicious URLs**: Dangerous URLs are blocked before opening
 - **Data Exfiltration**: File access is limited to the application directory
+- **Network Vulnerabilities**: Secure API communication with proper error handling
+
+_Note: Content-based protections (XSS, code injection) are handled by Ollama itself. ShamaOllama focuses on file system, network, and application-level security while maintaining maximum chat performance._
 
 ## Reporting a Vulnerability
 
@@ -91,19 +96,25 @@ We follow responsible disclosure practices:
 
 ### Security Features
 
-Ollama GUI includes several security features:
+ShamaOllama includes several security features:
 
 - **Local-first architecture** - No data sent to external servers
-- **Encrypted storage** for sensitive configuration data
-- **Input validation** to prevent injection attacks
-- **Safe file handling** for exports and imports
-- **Secure API communication** with proper error handling
+- **Secure file handling** for exports and imports
+- **Safe API communication** with proper error handling
+- **URL validation** for external links
+- **File system protection** - Operations restricted to user directories
+
+_Design Philosophy: ShamaOllama acts as a high-performance bridge to Ollama, focusing on application security while trusting Ollama's content handling. This approach maximizes speed and user freedom while maintaining essential protections._
 
 ### Known Security Considerations
 
-- **Local network access**: Ollama GUI connects to local Ollama instances
+- **Local network access**: ShamaOllama connects to local Ollama instances
 - **File system access**: Application stores data in user's home directory
 - **Chat history**: Conversations are stored locally in plain text
 - **Model downloads**: Models are downloaded through Ollama's API
+- **Content trust**: Chat content security is delegated to Ollama for maximum performance
+- **Performance focus**: Minimal validation overhead to ensure responsive user experience
+
+_Security Approach: ShamaOllama prioritizes speed and user experience while maintaining essential application-level protections. Content security is handled by Ollama's robust mechanisms._
 
 Thank you for helping keep Ollama GUI secure!

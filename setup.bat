@@ -70,11 +70,19 @@ echo.
 echo 🔗 Checking Ollama connection...
 curl -s http://localhost:11434/api/version >nul 2>&1
 if errorlevel 1 (
-    echo ⚠️  Ollama not detected at http://localhost:11434
-    echo Please ensure Ollama is installed and running:
-    echo   1. Download from https://ollama.ai
-    echo   2. Run: ollama serve
-    echo   3. Pull a model: ollama pull llama2
+    echo.
+    echo ❌ IMPORTANT: Ollama is not running or not installed!
+    echo.
+    echo 📋 NEXT STEPS - Install Ollama:
+    echo   1. Visit: https://ollama.ai
+    echo   2. Download and install Ollama for Windows
+    echo   3. Restart your computer (or open new terminal)
+    echo   4. Run: ollama pull llama3.2:1b  (small, fast model)
+    echo   5. Or run: ollama pull llama3.2:3b  (better quality)
+    echo.
+    echo 💡 Ollama is required for ShamaOllama to work!
+    echo    ShamaOllama will install but won't function without Ollama.
+    echo.
 ) else (
     echo ✅ Ollama is running and accessible!
 )

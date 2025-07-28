@@ -105,12 +105,20 @@ Thumbs.db
 *.bak
 *.backup
 
-# Screenshots (except documentation)
+# Screenshots (except documentation and assets)
 screenshots/
 *.png
 *.jpg
 *.jpeg
 *.gif
+
+# But keep assets and icon files
+!assets/
+!assets/**/*.png
+!assets/**/*.jpg
+!assets/**/*.jpeg
+!assets/**/*.gif
+!assets/**/*.ico
 
 # Documentation builds
 docs/_build/

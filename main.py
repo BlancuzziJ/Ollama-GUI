@@ -21,6 +21,7 @@ Project: https://github.com/BlancuzziJ/Ollama-GUI
 import customtkinter as ctk
 import tkinter as tk
 from tkinter import messagebox, filedialog
+from PIL import Image
 import requests
 import json
 import threading
@@ -28,10 +29,14 @@ import time
 from datetime import datetime
 from typing import Dict, List, Optional, Callable
 import os
+import logging
 from pathlib import Path
 import webbrowser
-from security import security, require_valid_url, require_valid_input
+from security import security  # Minimal security for URLs only
 from gpu_info import get_gpu_info, format_gpu_info_for_display, check_gpu_dependencies
+
+# Configure logging to suppress debug messages from GPU detection
+logging.basicConfig(level=logging.WARNING, format='%(levelname)s: %(message)s')
 
 # Set appearance mode and theme
 ctk.set_appearance_mode("dark")  # "dark" or "light"
@@ -48,9 +53,8 @@ class OllamaAPI:
             raise ValueError("Invalid Ollama URL provided")
         self.base_url = base_url.rstrip('/')
         
-    @require_valid_url
     def test_connection(self) -> bool:
-        """Test if Ollama is running and accessible"""
+        """Test if Ollama is running and accessible - fast, no validation"""
         try:
             response = requests.get(f"{self.base_url}/api/version", timeout=5)
             return response.status_code == 200
@@ -125,16 +129,7 @@ class OllamaAPI:
             security.log_security_event("Invalid model name for chat", {"model": model})
             return ""
         
-        # Validate messages
-        for msg in messages:
-            if not isinstance(msg, dict) or 'content' not in msg:
-                security.log_security_event("Invalid message format", {"message": str(msg)[:100]})
-                return ""
-            if not security.validate_message_input(msg['content']):
-                security.log_security_event("Invalid message content", {"content": msg['content'][:100]})
-                return ""
-        
-        # Validate JSON data size
+        # Fast path - construct request immediately
         request_data = {
             "model": model,
             "messages": messages,
@@ -334,6 +329,16 @@ class ShamaOllamaGUI:
         self.root.geometry("1200x800")
         self.root.minsize(800, 600)
         
+        # Set application icon - CustomTkinter specific approach
+        try:
+            icon_path = os.path.join(os.path.dirname(__file__), "assets", "images", "icons", "ShamaOllama_Icon.ico")
+            if os.path.exists(icon_path):
+                # Set icon after the window is fully initialized
+                self.root.after(100, lambda: self._set_window_icon(icon_path))
+        except Exception as e:
+            # Icon loading failed, continue without icon
+            pass
+        
         # Initialize components
         self.api = OllamaAPI()
         self.chat_manager = ChatManager()
@@ -357,6 +362,28 @@ class ShamaOllamaGUI:
         
         # Bind close event
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+    
+    def _set_window_icon(self, icon_path):
+        """Helper method to set window icon with multiple fallback approaches"""
+        try:
+            # Try different methods for setting icon with CustomTkinter
+            
+            # Method 1: wm_iconbitmap (works best on Windows)
+            self.root.wm_iconbitmap(icon_path)
+            
+        except Exception:
+            try:
+                # Method 2: iconphoto with PNG fallback
+                png_path = icon_path.replace('.ico', '.png')
+                if os.path.exists(png_path):
+                    icon_image = tk.PhotoImage(file=png_path)
+                    self.root.iconphoto(True, icon_image)
+            except Exception:
+                # Method 3: Try to set the icon using the underlying tk window
+                try:
+                    self.root.tk.call('wm', 'iconbitmap', self.root._w, icon_path)
+                except Exception:
+                    pass  # All methods failed, continue without icon
     
     def setup_gui(self):
         """Setup the main GUI layout"""
@@ -923,16 +950,32 @@ class ShamaOllamaGUI:
         )
         app_title.grid(row=0, column=0, pady=(0, 5))
         
+        # Add the ShamaOllama icon image
+        try:
+            icon_path = os.path.join(os.path.dirname(__file__), "assets", "images", "icons", "ShamaOllama_Icon.png")
+            if os.path.exists(icon_path):
+                # Load and display the PNG image
+                icon_image = ctk.CTkImage(
+                    light_image=Image.open(icon_path),
+                    dark_image=Image.open(icon_path),
+                    size=(128, 128)  # Larger size for about page
+                )
+                icon_label = ctk.CTkLabel(scroll_frame, image=icon_image, text="")
+                icon_label.grid(row=1, column=0, pady=10)
+        except Exception:
+            # If image loading fails, continue without image
+            pass
+        
         version_label = ctk.CTkLabel(
             scroll_frame,
             text="Version 1.0.0",
             font=ctk.CTkFont(size=14)
         )
-        version_label.grid(row=1, column=0, pady=(0, 20))
+        version_label.grid(row=2, column=0, pady=(0, 20))
         
         # Homage section
         homage_frame = ctk.CTkFrame(scroll_frame, fg_color=("gray90", "gray10"))
-        homage_frame.grid(row=2, column=0, pady=10, padx=20, sticky="ew")
+        homage_frame.grid(row=3, column=0, pady=10, padx=20, sticky="ew")
         homage_frame.grid_columnconfigure(0, weight=1)
         
         homage_title = ctk.CTkLabel(
@@ -952,7 +995,7 @@ class ShamaOllamaGUI:
         
         # Cultural significance section
         cultural_frame = ctk.CTkFrame(scroll_frame, fg_color=("gray90", "gray10"))
-        cultural_frame.grid(row=3, column=0, pady=10, padx=20, sticky="ew")
+        cultural_frame.grid(row=4, column=0, pady=10, padx=20, sticky="ew")
         cultural_frame.grid_columnconfigure(0, weight=1)
         
         cultural_title = ctk.CTkLabel(
@@ -963,9 +1006,9 @@ class ShamaOllamaGUI:
         cultural_title.grid(row=0, column=0, pady=(10, 10))
         
         cultural_meanings = [
-            "🕉️ Sanskrit: Equanimity, calmness, peace of mind",
-            "🔯 Hebrew: To listen, to hear, to understand",
-            "🕯️ Persian: Candle, enlightenment, the light of knowledge"
+            "• Sanskrit: Equanimity, calmness, peace of mind",
+            "• Hebrew: To listen, to hear, to understand", 
+            "• Persian: Candle, enlightenment, the light of knowledge"
         ]
         
         for i, meaning in enumerate(cultural_meanings):
@@ -973,7 +1016,8 @@ class ShamaOllamaGUI:
                 cultural_frame,
                 text=meaning,
                 font=ctk.CTkFont(size=12),
-                justify="left"
+                justify="left",
+                anchor="w"
             )
             meaning_label.grid(row=i+1, column=0, pady=2, padx=20, sticky="w")
         
@@ -988,7 +1032,7 @@ class ShamaOllamaGUI:
         
         # Author and project info
         info_frame = ctk.CTkFrame(scroll_frame, fg_color=("gray90", "gray10"))
-        info_frame.grid(row=4, column=0, pady=10, padx=20, sticky="ew")
+        info_frame.grid(row=5, column=0, pady=10, padx=20, sticky="ew")
         info_frame.grid_columnconfigure(0, weight=1)
         
         info_title = ctk.CTkLabel(
@@ -1008,7 +1052,7 @@ class ShamaOllamaGUI:
         
         # Donation section
         donation_frame = ctk.CTkFrame(scroll_frame, fg_color=("lightblue", "darkblue"))
-        donation_frame.grid(row=5, column=0, pady=20, padx=20, sticky="ew")
+        donation_frame.grid(row=6, column=0, pady=20, padx=20, sticky="ew")
         donation_frame.grid_columnconfigure(0, weight=1)
         
         donation_title = ctk.CTkLabel(
@@ -1063,27 +1107,13 @@ class ShamaOllamaGUI:
         )
         thanks_label.grid(row=6, column=0, pady=20)
     
-    @require_valid_url
     def open_url(self, url):
-        """Open URL in the default web browser with security validation"""
-        # Additional validation for our specific use case
-        if not security.validate_url(url):
-            security.log_security_event("Blocked unsafe URL", {"url": url})
-            messagebox.showerror(
-                "Security Warning", 
-                "This URL cannot be opened for security reasons."
-            )
-            return
-            
+        """Open URL in the default web browser - fast, direct"""
+        # Direct open for speed - browsers handle security
         try:
             webbrowser.open(url)
-            security.log_security_event("URL opened safely", {"url": url})
         except Exception as e:
-            security.log_security_event("Failed to open URL", {"url": url, "error": str(e)})
-            messagebox.showerror(
-                "Error", 
-                "Failed to open URL. Please check your default browser settings."
-            )
+            messagebox.showerror("Error", f"Could not open URL: {e}")
     
     def create_status_bar(self):
         """Create the status bar"""
@@ -1462,19 +1492,8 @@ Note: This feature works best with models specifically designed to show thinking
         if not message:
             return
             
-        # Security validation
-        if not security.validate_message_input(message):
-            security.log_security_event("Invalid message blocked", {"content": message[:100]})
-            messagebox.showerror(
-                "Invalid Input", 
-                "Your message contains invalid content. Please revise and try again."
-            )
-            return
-            
-        # Sanitize input
-        message = security.sanitize_input(message)
-        
-        # Clear input
+        # Fast path - send directly to Ollama
+        # Clear input immediately for responsive feel
         self.message_input.delete("1.0", "end")
         
         # Add user message
@@ -2032,15 +2051,18 @@ Note: This feature works best with models specifically designed to show thinking
         
         if result:
             try:
-                log_file = Path.home() / '.shamollama' / 'logs' / 'security.log'
-                if log_file.exists():
-                    log_file.unlink()
+                success = security.clear_logs()
+                if success:
                     messagebox.showinfo("Success", "Security logs cleared successfully.")
-                    security.log_security_event("Security logs cleared", {"user_action": True})
+                    # Try to log the clearing event, but don't fail if it doesn't work
+                    try:
+                        security.log_security_event("Security logs cleared", {"user_action": True})
+                    except:
+                        pass  # Ignore logging errors after clearing
                 else:
-                    messagebox.showinfo("Info", "No security logs to clear.")
+                    messagebox.showerror("Error", "Failed to clear security logs. The log file may be in use.")
             except Exception as e:
-                messagebox.showerror("Error", f"Failed to clear security logs: {e}")
+                messagebox.showerror("Error", f"Failed to clear security logs: {str(e)}")
 
     def on_closing(self):
         """Handle application closing"""

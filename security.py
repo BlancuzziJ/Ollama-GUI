@@ -37,7 +37,9 @@ class SecurityValidator:
         r'data:',                    # Data URLs
         r'vbscript:',                # VBScript URLs
         r'file://',                  # File protocol
-        r'[<>"\']',                  # HTML injection characters
+        # Removed overly restrictive HTML character pattern
+        r'<iframe[^>]*>.*?</iframe>', # Iframe injection
+        r'<object[^>]*>.*?</object>', # Object injection
     ]
     
     def __init__(self):
@@ -51,6 +53,12 @@ class SecurityValidator:
         log_dir.mkdir(parents=True, exist_ok=True)
         
         self.logger = logging.getLogger('ShamaOllama.Security')
+        
+        # Remove existing handlers to avoid duplicates
+        for handler in self.logger.handlers[:]:
+            handler.close()
+            self.logger.removeHandler(handler)
+        
         handler = logging.FileHandler(log_dir / 'security.log')
         formatter = logging.Formatter(
             '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -58,6 +66,70 @@ class SecurityValidator:
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)
         self.logger.setLevel(logging.INFO)
+    
+    def clear_logs(self) -> bool:
+        """Clear security logs safely"""
+        try:
+            log_file = Path.home() / '.shamollama' / 'logs' / 'security.log'
+            
+            # Step 1: Close all handlers for this logger
+            for handler in self.logger.handlers[:]:
+                handler.close()
+                self.logger.removeHandler(handler)
+            
+            # Step 2: Close all handlers for the root logger that might have this file
+            root_logger = logging.getLogger()
+            for handler in root_logger.handlers[:]:
+                if hasattr(handler, 'baseFilename') and 'security.log' in str(handler.baseFilename):
+                    handler.close()
+                    root_logger.removeHandler(handler)
+            
+            # Step 3: Force garbage collection to release any remaining references
+            import gc
+            gc.collect()
+            
+            # Step 4: Try to delete the file, with Windows-specific handling
+            if log_file.exists():
+                import time
+                import os
+                
+                # On Windows, sometimes we need to wait a moment for file handles to release
+                for attempt in range(3):
+                    try:
+                        # Try to rename first (this often works when delete doesn't)
+                        temp_file = log_file.with_suffix('.log.temp')
+                        if temp_file.exists():
+                            temp_file.unlink()
+                        log_file.rename(temp_file)
+                        temp_file.unlink()
+                        break
+                    except (OSError, PermissionError):
+                        if attempt < 2:
+                            time.sleep(0.1)  # Wait 100ms and try again
+                        else:
+                            # Final attempt: try to overwrite with empty content
+                            try:
+                                with open(log_file, 'w') as f:
+                                    f.write('')  # Clear the file content
+                                log_file.unlink()
+                            except:
+                                # Last resort: just clear the content
+                                with open(log_file, 'w') as f:
+                                    f.write('')
+                                # File exists but is now empty
+            
+            # Step 5: Recreate the logging setup
+            self.setup_logging()
+            
+            return True
+        except Exception as e:
+            # Try to recreate logging setup even if clearing failed
+            try:
+                self.setup_logging()
+            except:
+                pass
+            print(f"Debug: Log clearing failed with error: {e}")
+            return False
         
     def generate_session_token(self) -> str:
         """Generate a secure session token"""
@@ -124,20 +196,17 @@ class SecurityValidator:
         return bool(domain_pattern.match(host))
         
     def validate_message_input(self, message: str) -> bool:
-        """Validate user message input"""
+        """Validate user message input - simplified for chat usage"""
         try:
             if not message:
                 return False
                 
+            # Only check for reasonable length limits (prevent DOS)
             if len(message) > self.MAX_MESSAGE_LENGTH:
                 self.logger.warning(f"Message validation failed: Too long - {len(message)}")
                 return False
                 
-            # Check for dangerous patterns
-            if self.contains_dangerous_patterns(message):
-                self.logger.warning("Message validation failed: Contains dangerous patterns")
-                return False
-                
+            # No content filtering - users should be free to chat naturally
             return True
             
         except Exception as e:

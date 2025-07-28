@@ -72,7 +72,8 @@ class GPUInfo:
                     }
                     self.gpu_data.append(gpu_info)
             except Exception as e:
-                logging.warning(f"GPUtil detection failed: {e}")
+                logging.debug(f"GPUtil detection failed: {e}")
+                # Falling back to platform detection
         
         # Try platform-specific detection for other GPUs
         self._detect_platform_gpus()
@@ -136,7 +137,8 @@ class GPUInfo:
                             except (ValueError, IndexError):
                                 continue
         except Exception as e:
-            logging.warning(f"Windows GPU detection failed: {e}")
+            logging.debug(f"Windows GPU detection failed: {e}")
+            # Silently fall back to basic detection
     
     def _detect_macos_gpus(self):
         """Detect GPUs on macOS"""
@@ -169,7 +171,8 @@ class GPUInfo:
                         'vendor': self._guess_vendor(name)
                     })
         except Exception as e:
-            logging.warning(f"macOS GPU detection failed: {e}")
+            logging.debug(f"macOS GPU detection failed: {e}")
+            # Silently fall back to basic detection
     
     def _detect_linux_gpus(self):
         """Detect GPUs on Linux"""
@@ -233,7 +236,7 @@ class GPUInfo:
                     if freq:
                         self.cpu_info += f" @ {freq.current:.1f}GHz"
             except Exception as e:
-                logging.warning(f"System info detection failed: {e}")
+                logging.debug(f"System info detection failed: {e}")
                 self.system_ram = 0
                 self.cpu_info = "Unknown"
         else:
@@ -259,7 +262,7 @@ class GPUInfo:
                 self.cpu_info = f"{os.cpu_count()} cores (detected)"
                 
             except Exception as e:
-                logging.warning(f"Fallback system detection failed: {e}")
+                logging.debug(f"Fallback system detection failed: {e}")
                 self.system_ram = 0
                 self.cpu_info = "Unknown - Install requirements-gpu.txt for detailed info"
     
