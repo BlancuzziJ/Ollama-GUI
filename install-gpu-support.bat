@@ -7,11 +7,11 @@ pip install -r requirements-gpu.txt
 
 if %ERRORLEVEL% EQU 0 (
     echo.
-    echo ✅ GPU detection dependencies installed successfully!
+    echo [OK] GPU detection dependencies installed successfully!
     echo Enhanced hardware information is now available in ShamaOllama.
 ) else (
     echo.
-    echo ❌ Installation failed. Please check your Python and pip installation.
+    echo [X] Installation failed. Please check your Python and pip installation.
     echo You can still use ShamaOllama with basic GPU detection.
 )
 

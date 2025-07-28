@@ -1011,7 +1011,7 @@ class ShamaOllamaGUI:
         
         memory_header = ctk.CTkLabel(
             memory_frame,
-            text="🧠 Personal Memory",
+            text="Personal Memory",
             font=ctk.CTkFont(size=16, weight="bold")
         )
         memory_header.grid(row=0, column=0, columnspan=3, pady=10)
@@ -1080,7 +1080,7 @@ class ShamaOllamaGUI:
         # Save memory button
         self.save_memory_btn = ctk.CTkButton(
             memory_frame,
-            text="💾 Save Memory",
+            text="Save Memory",
             command=self.save_personal_memory,
             height=35,
             fg_color="green",
