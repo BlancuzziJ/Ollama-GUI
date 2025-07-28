@@ -239,6 +239,7 @@ class ChatManager:
         self.data_dir = Path.home() / ".shamollama"
         self.data_dir.mkdir(exist_ok=True)
         self.history_file = self.data_dir / "chat_history.json"
+        self.memory_manager = PersonalMemoryManager()
         self.load_history()
     
     def add_message(self, role: str, content: str, model: str = ""):
@@ -252,9 +253,24 @@ class ChatManager:
         self.current_session.append(message)
     
     def get_messages_for_api(self) -> List[Dict]:
-        """Get messages formatted for Ollama API"""
-        return [{"role": msg["role"], "content": msg["content"]} 
-                for msg in self.current_session if msg["role"] in ["user", "assistant"]]
+        """Get messages formatted for Ollama API with personal memory context"""
+        messages = []
+        
+        # Add personal memory context as system message if enabled
+        memory_context = self.memory_manager.get_system_context()
+        if memory_context:
+            messages.append({
+                "role": "system",
+                "content": memory_context
+            })
+        
+        # Add conversation messages
+        messages.extend([
+            {"role": msg["role"], "content": msg["content"]} 
+            for msg in self.current_session if msg["role"] in ["user", "assistant"]
+        ])
+        
+        return messages
     
     def save_session(self, title: str = ""):
         """Save current session to history"""
@@ -318,6 +334,109 @@ class ChatManager:
                         f.write(f"**{role}**: {msg['content']}\n\n")
         except Exception as e:
             raise Exception(f"Export failed: {str(e)}")
+
+
+class PersonalMemoryManager:
+    """Manages personal memory/context that gets injected into conversations"""
+    
+    def __init__(self):
+        self.data_dir = Path.home() / ".shamollama"
+        self.data_dir.mkdir(exist_ok=True)
+        self.memory_file = self.data_dir / "personal_memory.json"
+        self.memory = self.load_memory()
+    
+    def load_memory(self) -> dict:
+        """Load personal memory from file"""
+        try:
+            if self.memory_file.exists():
+                with open(self.memory_file, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            else:
+                # Default empty memory structure
+                return {
+                    "personal_info": {
+                        "name": "",
+                        "call_name": "",
+                        "role": "",
+                        "company": "",
+                        "location": "",
+                        "preferences": ""
+                    },
+                    "context_notes": "",
+                    "system_prompt": "",
+                    "enabled": True
+                }
+        except Exception:
+            return {
+                "personal_info": {
+                    "name": "",
+                    "call_name": "",
+                    "role": "",
+                    "company": "",
+                    "location": "", 
+                    "preferences": ""
+                },
+                "context_notes": "",
+                "system_prompt": "",
+                "enabled": True
+            }
+    
+    def save_memory(self):
+        """Save memory to file"""
+        try:
+            with open(self.memory_file, 'w', encoding='utf-8') as f:
+                json.dump(self.memory, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            print(f"Failed to save memory: {e}")
+    
+    def update_memory(self, **kwargs):
+        """Update memory fields"""
+        for key, value in kwargs.items():
+            if key in self.memory:
+                self.memory[key] = value
+            elif key in self.memory.get("personal_info", {}):
+                self.memory["personal_info"][key] = value
+        self.save_memory()
+    
+    def get_system_context(self) -> str:
+        """Generate system context from personal memory"""
+        if not self.memory.get("enabled", True):
+            return ""
+        
+        context_parts = []
+        
+        # Add personal info
+        info = self.memory.get("personal_info", {})
+        if any(info.values()):
+            context_parts.append("Personal Context:")
+            if info.get("name"):
+                context_parts.append(f"- My name is {info['name']}")
+            if info.get("call_name"):
+                context_parts.append(f"- Please call me: {info['call_name']}")
+            if info.get("role"):
+                context_parts.append(f"- My role is {info['role']}")
+            if info.get("company"):
+                context_parts.append(f"- I work at {info['company']}")
+            if info.get("location"):
+                context_parts.append(f"- I'm located in {info['location']}")
+            if info.get("preferences"):
+                context_parts.append(f"- My preferences: {info['preferences']}")
+        
+        # Add context notes
+        if self.memory.get("context_notes"):
+            if context_parts:
+                context_parts.append("")
+            context_parts.append("Additional Context:")
+            context_parts.append(self.memory["context_notes"])
+        
+        # Add custom system prompt
+        if self.memory.get("system_prompt"):
+            if context_parts:
+                context_parts.append("")
+            context_parts.append("Instructions:")
+            context_parts.append(self.memory["system_prompt"])
+        
+        return "\n".join(context_parts) if context_parts else ""
 
 
 class ShamaOllamaGUI:
@@ -885,6 +1004,90 @@ class ShamaOllamaGUI:
         )
         self.clear_logs_btn.grid(row=4, column=1, padx=10, pady=10, sticky="w")
         
+        # Personal Memory section
+        memory_frame = ctk.CTkFrame(self.settings_panel)
+        memory_frame.grid(row=3, column=0, padx=10, pady=10, sticky="ew")
+        memory_frame.grid_columnconfigure(1, weight=1)
+        
+        memory_header = ctk.CTkLabel(
+            memory_frame,
+            text="🧠 Personal Memory",
+            font=ctk.CTkFont(size=16, weight="bold")
+        )
+        memory_header.grid(row=0, column=0, columnspan=3, pady=10)
+        
+        # Enable memory checkbox
+        self.memory_enabled_var = ctk.BooleanVar(value=self.chat_manager.memory_manager.memory.get("enabled", True))
+        self.memory_enabled_check = ctk.CTkCheckBox(
+            memory_frame,
+            text="Enable personal memory (AI remembers details about you)",
+            variable=self.memory_enabled_var,
+            command=self.toggle_memory
+        )
+        self.memory_enabled_check.grid(row=1, column=0, columnspan=3, padx=10, pady=5, sticky="w")
+        
+        # Personal info fields
+        memory_info = self.chat_manager.memory_manager.memory.get("personal_info", {})
+        
+        # Name
+        ctk.CTkLabel(memory_frame, text="Your Name:").grid(row=2, column=0, padx=10, pady=5, sticky="w")
+        self.memory_name_entry = ctk.CTkEntry(memory_frame, placeholder_text="John Doe")
+        self.memory_name_entry.grid(row=2, column=1, padx=10, pady=5, sticky="ew")
+        self.memory_name_entry.insert(0, memory_info.get("name", ""))
+        
+        # What to call you (preferred name/title)
+        ctk.CTkLabel(memory_frame, text="What to call you:").grid(row=3, column=0, padx=10, pady=5, sticky="w")
+        self.memory_call_name_entry = ctk.CTkEntry(memory_frame, placeholder_text="John, Mr. Doe, Boss, etc.")
+        self.memory_call_name_entry.grid(row=3, column=1, padx=10, pady=5, sticky="ew")
+        self.memory_call_name_entry.insert(0, memory_info.get("call_name", ""))
+        
+        # Role
+        ctk.CTkLabel(memory_frame, text="Your Role:").grid(row=4, column=0, padx=10, pady=5, sticky="w")
+        self.memory_role_entry = ctk.CTkEntry(memory_frame, placeholder_text="Software Developer")
+        self.memory_role_entry.grid(row=4, column=1, padx=10, pady=5, sticky="ew")
+        self.memory_role_entry.insert(0, memory_info.get("role", ""))
+        
+        # Company
+        ctk.CTkLabel(memory_frame, text="Company:").grid(row=5, column=0, padx=10, pady=5, sticky="w")
+        self.memory_company_entry = ctk.CTkEntry(memory_frame, placeholder_text="Acme Corp")
+        self.memory_company_entry.grid(row=5, column=1, padx=10, pady=5, sticky="ew")
+        self.memory_company_entry.insert(0, memory_info.get("company", ""))
+        
+        # Location
+        ctk.CTkLabel(memory_frame, text="Location:").grid(row=6, column=0, padx=10, pady=5, sticky="w")
+        self.memory_location_entry = ctk.CTkEntry(memory_frame, placeholder_text="New York, NY")
+        self.memory_location_entry.grid(row=6, column=1, padx=10, pady=5, sticky="ew")
+        self.memory_location_entry.insert(0, memory_info.get("location", ""))
+        
+        # Preferences
+        ctk.CTkLabel(memory_frame, text="Preferences:").grid(row=7, column=0, padx=10, pady=5, sticky="w")
+        self.memory_preferences_entry = ctk.CTkEntry(memory_frame, placeholder_text="Concise answers, Python preferred")
+        self.memory_preferences_entry.grid(row=7, column=1, padx=10, pady=5, sticky="ew")
+        self.memory_preferences_entry.insert(0, memory_info.get("preferences", ""))
+        
+        # Context notes (larger text area)
+        ctk.CTkLabel(memory_frame, text="Additional Context:").grid(row=8, column=0, padx=10, pady=5, sticky="nw")
+        self.memory_context_text = ctk.CTkTextbox(memory_frame, height=80)
+        self.memory_context_text.grid(row=8, column=1, padx=10, pady=5, sticky="ew")
+        self.memory_context_text.insert("0.0", self.chat_manager.memory_manager.memory.get("context_notes", ""))
+        
+        # Custom system prompt
+        ctk.CTkLabel(memory_frame, text="Custom Instructions:").grid(row=9, column=0, padx=10, pady=5, sticky="nw")
+        self.memory_system_text = ctk.CTkTextbox(memory_frame, height=80)
+        self.memory_system_text.grid(row=9, column=1, padx=10, pady=5, sticky="ew")
+        self.memory_system_text.insert("0.0", self.chat_manager.memory_manager.memory.get("system_prompt", ""))
+        
+        # Save memory button
+        self.save_memory_btn = ctk.CTkButton(
+            memory_frame,
+            text="💾 Save Memory",
+            command=self.save_personal_memory,
+            height=35,
+            fg_color="green",
+            hover_color="darkgreen"
+        )
+        self.save_memory_btn.grid(row=10, column=0, columnspan=2, padx=10, pady=15)
+        
         # Save settings button
         self.save_settings_btn = ctk.CTkButton(
             form_frame,
@@ -993,46 +1196,9 @@ class ShamaOllamaGUI:
         )
         homage_text.grid(row=1, column=0, pady=(0, 10), padx=20)
         
-        # Cultural significance section
-        cultural_frame = ctk.CTkFrame(scroll_frame, fg_color=("gray90", "gray10"))
-        cultural_frame.grid(row=4, column=0, pady=10, padx=20, sticky="ew")
-        cultural_frame.grid_columnconfigure(0, weight=1)
-        
-        cultural_title = ctk.CTkLabel(
-            cultural_frame,
-            text="🌍 Cultural Significance of 'Shama'",
-            font=ctk.CTkFont(size=16, weight="bold")
-        )
-        cultural_title.grid(row=0, column=0, pady=(10, 10))
-        
-        cultural_meanings = [
-            "• Sanskrit: Equanimity, calmness, peace of mind",
-            "• Hebrew: To listen, to hear, to understand", 
-            "• Persian: Candle, enlightenment, the light of knowledge"
-        ]
-        
-        for i, meaning in enumerate(cultural_meanings):
-            meaning_label = ctk.CTkLabel(
-                cultural_frame,
-                text=meaning,
-                font=ctk.CTkFont(size=12),
-                justify="left",
-                anchor="w"
-            )
-            meaning_label.grid(row=i+1, column=0, pady=2, padx=20, sticky="w")
-        
-        # Perfect fit text
-        fit_label = ctk.CTkLabel(
-            cultural_frame,
-            text="These meanings perfectly embody our vision for AI interaction:\nbalanced, responsive, and enlightening.",
-            font=ctk.CTkFont(size=12, weight="bold"),
-            justify="center"
-        )
-        fit_label.grid(row=len(cultural_meanings)+1, column=0, pady=(10, 10), padx=20)
-        
         # Author and project info
         info_frame = ctk.CTkFrame(scroll_frame, fg_color=("gray90", "gray10"))
-        info_frame.grid(row=5, column=0, pady=10, padx=20, sticky="ew")
+        info_frame.grid(row=4, column=0, pady=10, padx=20, sticky="ew")
         info_frame.grid_columnconfigure(0, weight=1)
         
         info_title = ctk.CTkLabel(
@@ -1105,7 +1271,7 @@ class ShamaOllamaGUI:
             font=ctk.CTkFont(size=14, weight="bold"),
             justify="center"
         )
-        thanks_label.grid(row=6, column=0, pady=20)
+        thanks_label.grid(row=7, column=0, pady=20)
     
     def open_url(self, url):
         """Open URL in the default web browser - fast, direct"""
@@ -1981,6 +2147,54 @@ Note: This feature works best with models specifically designed to show thinking
                 security.log_security_event("Manual connection test failed", {"url": url})
         
         threading.Thread(target=test, daemon=True).start()
+
+    def toggle_memory(self):
+        """Toggle personal memory on/off"""
+        enabled = self.memory_enabled_var.get()
+        self.chat_manager.memory_manager.update_memory(enabled=enabled)
+        
+        # Enable/disable memory input fields
+        state = "normal" if enabled else "disabled"
+        self.memory_name_entry.configure(state=state)
+        self.memory_call_name_entry.configure(state=state)
+        self.memory_role_entry.configure(state=state)
+        self.memory_company_entry.configure(state=state)
+        self.memory_location_entry.configure(state=state)
+        self.memory_preferences_entry.configure(state=state)
+        self.memory_context_text.configure(state=state)
+        self.memory_system_text.configure(state=state)
+        self.save_memory_btn.configure(state=state)
+
+    def save_personal_memory(self):
+        """Save personal memory settings"""
+        try:
+            # Get values from UI
+            personal_info = {
+                "name": self.memory_name_entry.get().strip(),
+                "call_name": self.memory_call_name_entry.get().strip(),
+                "role": self.memory_role_entry.get().strip(),
+                "company": self.memory_company_entry.get().strip(),
+                "location": self.memory_location_entry.get().strip(),
+                "preferences": self.memory_preferences_entry.get().strip()
+            }
+            
+            context_notes = self.memory_context_text.get("0.0", "end-1c").strip()
+            system_prompt = self.memory_system_text.get("0.0", "end-1c").strip()
+            enabled = self.memory_enabled_var.get()
+            
+            # Update memory
+            self.chat_manager.memory_manager.update_memory(
+                personal_info=personal_info,
+                context_notes=context_notes,
+                system_prompt=system_prompt,
+                enabled=enabled
+            )
+            
+            # Show success message
+            messagebox.showinfo("Success", "Personal memory saved successfully!")
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to save memory: {str(e)}")
 
     def save_settings(self):
         """Save application settings"""

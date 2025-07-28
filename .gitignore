@@ -80,8 +80,10 @@ dmypy.json
 
 # User data
 .ollama_gui/
+.shamollama/
 chat_history.json
 settings.json
+personal_memory.json
 
 # OS specific
 .DS_Store
