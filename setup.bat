@@ -1,20 +1,6 @@
 @echo off
-REM ShamaOllama Setup Script for Window    echo [X] Failed to activate virtual environment
-    pause
-    exit /b 1
-)
-
-REM Install dependencies
-echo.
-echo Installing dependencies...
-pip install -r requirements.txt
-if errorlevel 1 (
-    echo [X] Failed to install dependencies
-    pause
-    exit /b 1
-)
-
-echo [OK] Dependencies installed successfully (c) 2025 John Blancuzzi
+REM ShamaOllama Setup Script for Windows
+REM Copyright (c) 2025 John Blancuzzi
 REM Licensed under the MIT License
 REM Paying homage to "Shama Lama Ding Dong" from Animal House (1978)
 
