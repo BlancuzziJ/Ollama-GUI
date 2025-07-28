@@ -8,8 +8,8 @@ import sys
 import os
 from pathlib import Path
 
-# Add the current directory to the path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Add the parent directory to the path to find main modules
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 def test_security_imports():
     """Test that security module imports correctly"""

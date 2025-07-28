@@ -3,6 +3,12 @@
 Simple test for GPU dependencies
 """
 
+import sys
+from pathlib import Path
+
+# Add parent directory to path to find main modules
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 print("Testing GPU Dependencies...")
 print("=" * 40)
 

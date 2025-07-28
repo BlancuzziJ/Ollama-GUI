@@ -5,9 +5,10 @@ Quick test script for ShamaOllama features
 
 import sys
 import os
+from pathlib import Path
 
-# Add the current directory to the path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Add parent directory to path to find main modules
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 def test_imports():
     """Test that all required modules can be imported"""

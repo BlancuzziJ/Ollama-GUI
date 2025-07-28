@@ -48,6 +48,11 @@ def main():
     passed = 0
     failed = 0
     
+    # Change to tests directory to find test files
+    test_dir = Path(__file__).parent
+    original_dir = os.getcwd()
+    os.chdir(test_dir)
+    
     # Run each test
     for test_file in test_files:
         if os.path.exists(test_file):
@@ -57,6 +62,9 @@ def main():
                 failed += 1
         else:
             print(f"⚠️ {test_file} not found, skipping...")
+    
+    # Return to original directory
+    os.chdir(original_dir)
     
     # Summary
     print(f"\n{'='*60}")

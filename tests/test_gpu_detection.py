@@ -3,6 +3,12 @@
 Test script to demonstrate GPU detection with and without optional dependencies
 """
 
+import sys
+from pathlib import Path
+
+# Add parent directory to path to find main modules
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 def test_basic_detection():
     """Test basic GPU detection (always available)"""
     print("=" * 60)
