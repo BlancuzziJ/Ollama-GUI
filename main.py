@@ -1290,6 +1290,18 @@ class ShamaOllamaGUI:
         )
         author_label.grid(row=1, column=0, pady=(0, 10), padx=20)
 
+        # Instructions PDF button
+        instructions_btn = ctk.CTkButton(
+            info_frame,
+            text="📖 Open Instructions (PDF)",
+            command=self.open_pdf_instructions,
+            height=35,
+            font=ctk.CTkFont(size=12, weight="bold"),
+            fg_color=("blue", "darkblue"),
+            hover_color=("lightblue", "blue"),
+        )
+        instructions_btn.grid(row=2, column=0, pady=(0, 15))
+
         # Donation section
         donation_frame = ctk.CTkFrame(scroll_frame, fg_color=("lightblue", "darkblue"))
         donation_frame.grid(row=6, column=0, pady=20, padx=20, sticky="ew")
@@ -1354,6 +1366,29 @@ class ShamaOllamaGUI:
             webbrowser.open(url)
         except Exception as e:
             messagebox.showerror("Error", f"Could not open URL: {e}")
+
+    def open_pdf_instructions(self):
+        """Open the PDF instructions file with the default PDF viewer"""
+        try:
+            pdf_path = os.path.join(
+                os.path.dirname(__file__), "Help", "ShamaOllama - Instructions.pdf"
+            )
+            
+            if not os.path.exists(pdf_path):
+                messagebox.showerror(
+                    "File Not Found", 
+                    "Instructions PDF not found at:\n" + pdf_path
+                )
+                return
+            
+            # Use platform-specific method to open PDF
+            if os.name == 'nt':  # Windows
+                os.startfile(pdf_path)
+            else:  # macOS and Linux
+                webbrowser.open('file://' + os.path.abspath(pdf_path))
+                
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not open PDF instructions: {e}")
 
     def create_status_bar(self):
         """Create the status bar"""
