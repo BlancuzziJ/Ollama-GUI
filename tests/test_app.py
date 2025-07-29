@@ -10,21 +10,25 @@ from pathlib import Path
 # Add parent directory to path to find main modules
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+
 def test_imports():
     """Test that all required modules can be imported"""
     try:
         import customtkinter as ctk
         import requests
+
         print("✅ All required modules imported successfully")
         return True
     except ImportError as e:
         print(f"❌ Import error: {e}")
         return False
 
+
 def test_app_creation():
     """Test that the app can be created without errors"""
     try:
         from main import ShamaOllamaGUI
+
         print("✅ ShamaOllamaGUI class imported successfully")
         return True
     except ImportError as e:
@@ -34,18 +38,19 @@ def test_app_creation():
         print(f"❌ Error creating app: {e}")
         return False
 
+
 if __name__ == "__main__":
     print("🧪 Testing ShamaOllama...")
     print("=" * 40)
-    
+
     # Test imports
     if not test_imports():
         sys.exit(1)
-    
+
     # Test app creation
     if not test_app_creation():
         sys.exit(1)
-    
+
     print("=" * 40)
     print("🎉 All tests passed! ShamaOllama is ready to run.")
     print("\nNew features added:")
