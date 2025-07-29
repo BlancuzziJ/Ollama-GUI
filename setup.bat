@@ -98,7 +98,7 @@ set /p create_shortcut="Create desktop shortcut? (y/n): "
 if /i "%create_shortcut%"=="y" (
     echo.
     echo [CREATE] Creating desktop shortcut...
-    call create_desktop_shortcut.bat
+    call create_desktop_shortcut_simple.bat
     echo.
 )
 

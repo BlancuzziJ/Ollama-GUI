@@ -1416,7 +1416,8 @@ Note: This feature works best with models specifically designed to show thinking
                 
                 self.root.after(0, lambda: self.status_label.configure(text=f"Found {len(self.models)} models"))
             except Exception as e:
-                self.root.after(0, lambda: self.status_label.configure(text=f"Error loading models: {str(e)}"))
+                error_msg = str(e)
+                self.root.after(0, lambda: self.status_label.configure(text=f"Error loading models: {error_msg}"))
         
         threading.Thread(target=refresh, daemon=True).start()
 

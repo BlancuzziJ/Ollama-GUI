@@ -51,7 +51,8 @@ def refresh_models(self):
             
             self.root.after(0, lambda: self.status_label.configure(text=f"Found {len(self.models)} models"))
         except Exception as e:
-            self.root.after(0, lambda: self.status_label.configure(text=f"Error loading models: {str(e)}"))
+            error_msg = str(e)
+            self.root.after(0, lambda: self.status_label.configure(text=f"Error loading models: {error_msg}"))
     
     threading.Thread(target=refresh, daemon=True).start()
 
@@ -240,7 +241,8 @@ def pull_model(self):
                 self.root.after(0, lambda: self.progress_label.configure(text=f"Failed to pull {model_name}"))
             
         except Exception as e:
-            self.root.after(0, lambda: self.progress_label.configure(text=f"Error: {str(e)}"))
+            error_msg = str(e)
+            self.root.after(0, lambda: self.progress_label.configure(text=f"Error: {error_msg}"))
         finally:
             self.root.after(0, lambda: self.pull_btn.configure(text="Pull", state="normal"))
             self.root.after(0, lambda: self.progress_bar.set(0))
